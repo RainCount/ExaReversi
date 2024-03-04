@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角形黑白棋棋盘</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/two.js/0.7.0/two.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f8f8f8;
+        }
+        #draw-shapes {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="draw-shapes"></div>
+    <script>
+        var createTriangleBoard = function(two, boardStructure, colors, rotation) {
+            var width = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
+            var sideLength = width / 7; // 三角形的边长
+            var height = sideLength * Math.sqrt(3) / 2; // 等边三角形的高
+
+            // 获取屏幕的中心坐标
+            var centerX = two.width / 2;
+            var centerY = two.height / 2;
+
+            // 绘制上半部分的棋盘
+            var group = two.makeGroup(); // 创建一个组来存储所有三角形
+            boardStructure.forEach((numTriangles, rowIndex) => {
+                var y = centerY - (boardStructure.length / 2 * height) + rowIndex * height;
+                for (var i = 0; i < numTriangles; i++) {
+                    var x = centerX - (numTriangles - 1) * sideLength / 2 + i * sideLength;
+                    var triangle = two.makePolygon(x, y, sideLength / 2, 3);
+                    triangle.noStroke();
+                    triangle.fill = colors;
+                    triangle.rotation = rotation;
+
+                    group.add(triangle); // 将三角形添加到组中
+                }
+            });
+            group.translation.set(0, rotation === 0 ? sideLength / 7 : -sideLength / 7);
+
+            two.update();
+        };
+
+        var colors = { up: '#88d675', down: '#ffd34e' }; // 三角形的颜色
+
+        var elem = document.getElementById('draw-shapes');
+        var two = new Two({ 
+            fullscreen: true, 
+            autostart: true 
+        }).appendTo(elem);
+
+        createTriangleBoard(two, [4, 5, 6, 5, 4, 3], colors.up, 0);
+        createTriangleBoard(two, [3, 4, 5, 6, 5, 4], colors.down, Math.PI);
+
+        for (let i = 2; i <= 28; i++) {
+                let elem = document.getElementById('two-' + i);
+                if (elem) {
+                    elem.addEventListener('click', function() {
+                        elem.setAttribute('fill', elem.getAttribute('fill') === colors.up ? '#000000' : colors.up);
+                    });
+                }
+            }
+        for (let i = 30; i <= 56; i++) {
+            let elem = document.getElementById('two-' + i);
+            if (elem) {
+                elem.addEventListener('click', function() {
+                    elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
+                });
+            }
+        }
+
+    </script>
+</body>
+</html>
