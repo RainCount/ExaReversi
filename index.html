@@ -62,6 +62,44 @@
         createTriangleBoard(two, [4, 5, 6, 5, 4, 3], colors.up, 0);
         createTriangleBoard(two, [3, 4, 5, 6, 5, 4], colors.down, Math.PI);
 
+        //创建一个类，用于存储棋子的状态
+        class Piece {
+            constructor(id, color) {
+                this.id = id;
+                this.color = color;
+            }
+        }
+
+        //创建一个数组，用于存储判断棋子的状态
+        let piecesRow1 = [];
+        let piecesRow2 = [];
+        let piecesRow3 = [];
+        let piecesRow4 = [];
+        let piecesRow5 = [];
+        let piecesRow6 = [];
+
+        //初始化判断数组
+        for (let i = 0; i < 7; i++) {
+            piecesRow1.push(new Piece(i, 'none'));
+        }
+        for (let i = 8; i < 17; i++) {
+            piecesRow2.push(new Piece(i, 'none'));
+        }
+        for (let i = 18; i < 29; i++) {
+            piecesRow3.push(new Piece(i, 'none'));
+        }
+        for (let i = 30; i < 41; i++) {
+            piecesRow4.push(new Piece(i, 'none'));
+        }
+        for (let i = 42; i < 49; i++) {
+            piecesRow5.push(new Piece(i, 'none'));
+        }
+        for (let i = 50; i < 57; i++) {
+            piecesRow6.push(new Piece(i, 'none'));
+        }
+
+
+
         for (let i = 2; i <= 28; i++) {
                 let elem = document.getElementById('two-' + i);
                 if (elem) {
