@@ -12,7 +12,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f8f8f8;
+            background-color: #5a5a5a;
         }
         #draw-shapes {
             width: 100%;
@@ -63,59 +63,182 @@
         createTriangleBoard(two, [3, 4, 5, 6, 5, 4], colors.down, Math.PI);
 
         //创建一个类，用于存储棋子的状态
+        class Board {
+            constructor() {
+                this.rows = [
+                    // 横行
+                    [1, 2, 3, 4, 5, 6, 7],
+                    [8, 9, 10, 11, 12, 13, 14, 15, 16],
+                    [17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+                    [28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38],
+                    [39, 40, 41, 42, 43, 44, 45, 46, 47],
+                    [48, 49, 50, 51, 52, 53, 54],
+                    // 左斜行
+                    [2, 1, 9, 8, 18, 17, 28],
+                    [4, 3, 11, 10, 20, 19, 30, 29, 39],
+                    [6, 5, 13, 12, 22, 21, 32, 31, 41, 40, 48],
+                    [7, 15, 14, 24, 23, 34, 33, 43, 42, 50, 49],
+                    [16, 26, 25, 36, 35, 45, 44, 52, 51],
+                    [27, 38, 37, 47, 46, 54, 53],
+                    // 右斜行
+                    [6, 7, 15, 16, 26, 27, 38],
+                    [4, 5, 13, 14, 24, 25, 36, 37, 47],
+                    [2, 3, 11, 12, 22, 23, 34, 35, 45, 46, 54],
+                    [1, 9, 10, 20, 21, 32, 33, 43, 44, 52, 53],
+                    [8, 18, 19, 30, 31, 41, 42, 50, 51],
+                    [17, 28, 29, 39, 40, 48, 49]
+                ];
+                this.pieces = [];
+                for (let i = 1; i <= 54; i++) {
+                    this.pieces[i] = new Piece(i, null); // 初始时，棋子的颜色为null
+                }
+
+                this.pieces[21].color = "#000000";
+                this.pieces[23].color = "#000000";
+                this.pieces[33].color = "#000000";
+                this.pieces[22].color = "#FFFFFF";
+                this.pieces[32].color = "#FFFFFF";
+                this.pieces[34].color = "#FFFFFF";
+
+                console.log(this.pieces);
+                console.log(this.rows.length);
+            }
+
+            // 判断某个棋子是否可以被翻转
+            canFlip(pieceId) {
+                let piece = this.pieces[pieceId];
+                if (piece.color === null) {
+                    return false; // 如果棋子没有颜色，那么它不能被翻转
+                }
+                // 遍历所有的行，查找包含这个棋子的行
+                for (let i = 0; i < this.rows.length; i++) {
+                    let row = this.rows[i];
+                    let index = row.indexOf(pieceId);
+                    if (index !== -1) {
+                        // 如果找到了包含这个棋子的行，那么判断这个棋子是否可以被翻转
+                        // 这里的逻辑需要你自己实现
+                    }
+                }
+                return false;
+            }
+
+            //判断某个棋子是否可以被放置
+            canPlace(pieceId, color) {
+                let piece = this.pieces[pieceId];
+                if (piece.color !== null) {
+                    return false; // 如果棋子已经有颜色了，那么它不能被放置
+                }
+                // 遍历所有的行，查找包含这个棋子的行
+                for (let i = 0; i < this.rows.length; i++) {
+                    let row = this.rows[i];
+                    let index = row.indexOf(pieceId);
+                    if (index !== -1) {
+                        // 如果找到了包含这个棋子的行，那么判断这个棋子是否可以被放置
+                        // 这里的逻辑需要你自己实现
+                    }
+                }
+                return false;
+            }
+
+            //按照棋盘的布局，获取某个棋子的邻居
+            getNeighbors(pieceId) {
+                let neighbors = [];
+                for (let i = 0; i < this.rows.length; i++) {
+                    let row = this.rows[i];
+                    let index = row.indexOf(pieceId);
+                    if (index !== -1) {
+                        // 如果找到了包含这个棋子的行，那么获取这个棋子的邻居
+                        
+                    }
+                }
+                return neighbors;
+            }
+
+            //按照棋盘的布局，输出棋盘的状态
+            printBoard() {
+                for (let i = 0; i < 6; i++) {
+                    let row = this.rows[i];
+                    let rowStatus = "";
+
+                    if(i === 0 || i === 5){
+                        rowStatus += "  ";
+                    }
+                    if(i === 1 || i === 4){
+                        rowStatus += " ";
+                    }
+
+                    for (let j = 0; j < row.length; j++) {
+                        let piece = this.pieces[row[j]];
+                        if (piece.color === null) {
+                            rowStatus += "0";
+                        } else if (piece.color === "#000000") {
+                            rowStatus += "B";
+                        } else if (piece.color === "#FFFFFF") {
+                            rowStatus += "W";
+                        }
+                    }
+                    console.log(rowStatus);
+                }
+            }
+
+        }
+
         class Piece {
             constructor(id, color) {
                 this.id = id;
                 this.color = color;
             }
+
+            flip() {
+                if (this.color === '#000000') {
+                    this.color = '#FFFFFF';
+                } else if (this.color === '#FFFFFF') {
+                    this.color = '#000000';
+                }
+            }
         }
 
-        //创建一个数组，用于存储判断棋子的状态
-        let piecesRow1 = [];
-        let piecesRow2 = [];
-        let piecesRow3 = [];
-        let piecesRow4 = [];
-        let piecesRow5 = [];
-        let piecesRow6 = [];
-
-        //初始化判断数组
-        for (let i = 0; i < 7; i++) {
-            piecesRow1.push(new Piece(i, 'none'));
-        }
-        for (let i = 8; i < 17; i++) {
-            piecesRow2.push(new Piece(i, 'none'));
-        }
-        for (let i = 18; i < 29; i++) {
-            piecesRow3.push(new Piece(i, 'none'));
-        }
-        for (let i = 30; i < 41; i++) {
-            piecesRow4.push(new Piece(i, 'none'));
-        }
-        for (let i = 42; i < 49; i++) {
-            piecesRow5.push(new Piece(i, 'none'));
-        }
-        for (let i = 50; i < 57; i++) {
-            piecesRow6.push(new Piece(i, 'none'));
-        }
+        let board = new Board();
+        // 在这里处理棋子的逻辑
+        board.printBoard();
 
 
+
+
+
+        let idMapping = {
+            'two-2': 1, 'two-30': 2, 'two-3': 3, 'two-31': 4, 'two-4': 5, 'two-32': 6, 'two-5': 7,
+            'two-6': 8, 'two-33': 9, 'two-7': 10, 'two-34': 11, 'two-8': 12, 'two-35': 13, 'two-9': 14, 'two-36': 15, 'two-10': 16,
+            'two-11': 17, 'two-37': 18, 'two-12': 19, 'two-38': 20, 'two-13': 21, 'two-39': 22, 'two-14': 23, 'two-40': 24, 'two-15': 25, 'two-41': 26, 'two-16': 27,
+            'two-42': 28, 'two-17': 29, 'two-43': 30, 'two-18': 31, 'two-44': 32, 'two-19': 33, 'two-45': 34, 'two-20': 35, 'two-46': 36, 'two-21': 37, 'two-47': 38,
+            'two-48': 39, 'two-22': 40, 'two-49': 41, 'two-23': 42, 'two-50': 43, 'two-24': 44, 'two-51': 45, 'two-25': 46, 'two-52': 47,
+            'two-53': 48, 'two-26': 49, 'two-54': 50, 'two-27': 51, 'two-55': 52, 'two-28': 53, 'two-56': 54
+        };
 
         for (let i = 2; i <= 28; i++) {
                 let elem = document.getElementById('two-' + i);
                 if (elem) {
                     elem.addEventListener('click', function() {
-                        elem.setAttribute('fill', elem.getAttribute('fill') === colors.up ? '#000000' : colors.up);
+                        console.log(idMapping[elem.id])
+                        // elem.setAttribute('fill', elem.getAttribute('fill') === colors.up ? '#000000' : colors.up);
+
                     });
+                    elem.setAttribute('fill', board.pieces[idMapping[elem.id]].color === null ? colors.up : board.pieces[idMapping[elem.id]].color);
                 }
             }
         for (let i = 30; i <= 56; i++) {
             let elem = document.getElementById('two-' + i);
             if (elem) {
                 elem.addEventListener('click', function() {
-                    elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
+                    console.log(idMapping[elem.id])
+                    // elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
+
                 });
+                elem.setAttribute('fill', board.pieces[idMapping[elem.id]].color === null ? colors.down : board.pieces[idMapping[elem.id]].color);
             }
         }
+
+
 
     </script>
 </body>
