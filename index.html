@@ -128,13 +128,36 @@
                 if (piece.color !== null) {
                     return false; // 如果棋子已经有颜色了，那么它不能被放置
                 }
+                let opponentColor = color === "#000000" ? "#FFFFFF" : "#000000";
                 // 遍历所有的行，查找包含这个棋子的行
                 for (let i = 0; i < this.rows.length; i++) {
                     let row = this.rows[i];
                     let index = row.indexOf(pieceId);
                     if (index !== -1) {
                         // 如果找到了包含这个棋子的行，那么判断这个棋子是否可以被放置
-                        // 这里的逻辑需要你自己实现
+                        // 检查这个棋子左边和右边是否有对方的棋子，如果有，那么这个棋子就可以被放置
+                        if (index > 0 && this.pieces[row[index - 1]].color === opponentColor) {
+                            // 检查对方的棋子的左边是否有自己的棋子
+                            for (let j = index - 2; j >= 0; j--) {
+                                if (this.pieces[row[j]].color === color) {
+                                    this.pieces[pieceId].color = "#4DC4FF";
+                                    return true;
+                                } else if (this.pieces[row[j]].color === null) {
+                                    break;
+                                }
+                            }
+                        }
+                        if (index < row.length - 1 && this.pieces[row[index + 1]].color === opponentColor) {
+                            // 检查对方的棋子的右边是否有自己的棋子
+                            for (let j = index + 2; j < row.length; j++) {
+                                if (this.pieces[row[j]].color === color) {
+                                    this.pieces[pieceId].color = "#4DC4FF";
+                                    return true;
+                                } else if (this.pieces[row[j]].color === null) {
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
                 return false;
@@ -175,6 +198,8 @@
                             rowStatus += "B";
                         } else if (piece.color === "#FFFFFF") {
                             rowStatus += "W";
+                        } else if (piece.color === "#4DC4FF") {
+                            rowStatus += "X";
                         }
                     }
                     console.log(rowStatus);
@@ -198,13 +223,52 @@
             }
         }
 
-        let board = new Board();
-        // 在这里处理棋子的逻辑
-        board.printBoard();
+        class Game {
+            constructor() {
+                this.board = new Board();
+                this.currentPlayer = "#000000"; // 黑子先下
+            }
 
+            // 判断当前玩家是否有合法的落子位置
+            hasLegalMove() {
+                let result = false;
+                for (let i = 1; i <= 54; i++) {
+                    if (this.board.canPlace(i, this.currentPlayer)) {
+                        result = true;
+                    }
+                }
+                return result;
+            }
 
+            // 落子并翻转对方的棋子
+            makeMove(pieceId) {
+                if (this.board.canPlace(pieceId, this.currentPlayer)) {
+                    this.board.pieces[pieceId].color = this.currentPlayer;
+                    this.flipOpponentPieces(pieceId);
+                    this.switchPlayer();
+                } else {
+                    console.log("Illegal move!");
+                }
+            }
 
+            // 翻转对方的棋子
+            flipOpponentPieces(pieceId) {
+                // 这里的逻辑需要你自己实现，你需要找到所有需要翻转的对方的棋子，并调用它们的flip方法
+            }
 
+            // 切换当前玩家
+            switchPlayer() {
+                if (this.currentPlayer === "#000000") {
+                    this.currentPlayer = "#FFFFFF";
+                } else {
+                    this.currentPlayer = "#000000";
+                }
+                if (!this.hasLegalMove()) {
+                    this.switchPlayer();
+                }
+            }
+        }
+        
 
         let idMapping = {
             'two-2': 1, 'two-30': 2, 'two-3': 3, 'two-31': 4, 'two-4': 5, 'two-32': 6, 'two-5': 7,
@@ -215,30 +279,71 @@
             'two-53': 48, 'two-26': 49, 'two-54': 50, 'two-27': 51, 'two-55': 52, 'two-28': 53, 'two-56': 54
         };
 
-        for (let i = 2; i <= 28; i++) {
+        let userInputResolve = null;
+
+        function initialize() {
+            for (let i = 2; i <= 28; i++) {
                 let elem = document.getElementById('two-' + i);
                 if (elem) {
                     elem.addEventListener('click', function() {
-                        console.log(idMapping[elem.id])
+                        userInput = idMapping[elem.id];
+                        console.log(idMapping[elem.id]);
                         // elem.setAttribute('fill', elem.getAttribute('fill') === colors.up ? '#000000' : colors.up);
-
                     });
-                    elem.setAttribute('fill', board.pieces[idMapping[elem.id]].color === null ? colors.up : board.pieces[idMapping[elem.id]].color);
+                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.up : game.board.pieces[idMapping[elem.id]].color);
                 }
             }
-        for (let i = 30; i <= 56; i++) {
-            let elem = document.getElementById('two-' + i);
-            if (elem) {
-                elem.addEventListener('click', function() {
-                    console.log(idMapping[elem.id])
-                    // elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
-
-                });
-                elem.setAttribute('fill', board.pieces[idMapping[elem.id]].color === null ? colors.down : board.pieces[idMapping[elem.id]].color);
+            for (let i = 30; i <= 56; i++) {
+                let elem = document.getElementById('two-' + i);
+                if (elem) {
+                    elem.addEventListener('click', function() {
+                        userInput = idMapping[elem.id];
+                        console.log(idMapping[elem.id]);
+                        // elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
+                    });
+                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.down : game.board.pieces[idMapping[elem.id]].color);
+                }
             }
         }
 
+        function renderMap() {
+            for (let i = 2; i <= 28; i++) {
+                let elem = document.getElementById('two-' + i);
+                if (elem) {
+                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.up : game.board.pieces[idMapping[elem.id]].color);
+                }
+            }
+            for (let i = 30; i <= 56; i++) {
+                let elem = document.getElementById('two-' + i);
+                if (elem) {
+                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.down : game.board.pieces[idMapping[elem.id]].color);
+                }
+            }
+            console.log("\n");
+            game.board.printBoard();
+        }
 
+        let game = new Game();
+        game.board.printBoard();
+        initialize();
+
+        async function main() {
+            while (game.hasLegalMove()) {
+                renderMap();
+                let pieceId = await getUserInput();
+                game.makeMove(pieceId);
+            }
+
+            console.log("Game over!");
+        }
+
+        function getUserInput() {
+            return new Promise(resolve => {
+                userInputResolve = resolve;
+            });
+        }
+
+        main();
 
     </script>
 </body>
