@@ -51,7 +51,7 @@
             two.update();
         };
 
-        var colors = { up: '#88d675', down: '#ffd34e' }; // 三角形的颜色
+        var colors = { up: '#88d675', down: '#ffd34e' , colorP1: '#000000', colorP2: '#FFFFFF', colorPre: '#4DC4FF'}; // 三角形的颜色
 
         var elem = document.getElementById('draw-shapes');
         var two = new Two({ 
@@ -104,27 +104,12 @@
                 console.log(this.rows.length);
             }
 
-            // 判断某个棋子是否可以被翻转
-            canFlip(pieceId) {
-                let piece = this.pieces[pieceId];
-                if (piece.color === null) {
-                    return false; // 如果棋子没有颜色，那么它不能被翻转
-                }
-                // 遍历所有的行，查找包含这个棋子的行
-                for (let i = 0; i < this.rows.length; i++) {
-                    let row = this.rows[i];
-                    let index = row.indexOf(pieceId);
-                    if (index !== -1) {
-                        // 如果找到了包含这个棋子的行，那么判断这个棋子是否可以被翻转
-                        // 这里的逻辑需要你自己实现
-                    }
-                }
-                return false;
-            }
-
             //判断某个棋子是否可以被放置
             canPlace(pieceId, color) {
                 let piece = this.pieces[pieceId];
+                if (piece.color === "#4DC4FF") {
+                    piece.color = null;
+                }
                 if (piece.color !== null) {
                     return false; // 如果棋子已经有颜色了，那么它不能被放置
                 }
@@ -139,42 +124,28 @@
                         if (index > 0 && this.pieces[row[index - 1]].color === opponentColor) {
                             // 检查对方的棋子的左边是否有自己的棋子
                             for (let j = index - 2; j >= 0; j--) {
-                                if (this.pieces[row[j]].color === color) {
+                                if (this.pieces[row[j]].color === null || this.pieces[row[j]].color === "#4DC4FF") {
+                                    break;
+                                } else if (this.pieces[row[j]].color === color) {
                                     this.pieces[pieceId].color = "#4DC4FF";
                                     return true;
-                                } else if (this.pieces[row[j]].color === null) {
-                                    break;
                                 }
                             }
                         }
                         if (index < row.length - 1 && this.pieces[row[index + 1]].color === opponentColor) {
                             // 检查对方的棋子的右边是否有自己的棋子
                             for (let j = index + 2; j < row.length; j++) {
-                                if (this.pieces[row[j]].color === color) {
+                                if (this.pieces[row[j]].color === null || this.pieces[row[j]].color === "#4DC4FF") {
+                                    break;
+                                } else if (this.pieces[row[j]].color === color) {
                                     this.pieces[pieceId].color = "#4DC4FF";
                                     return true;
-                                } else if (this.pieces[row[j]].color === null) {
-                                    break;
                                 }
                             }
                         }
                     }
                 }
                 return false;
-            }
-
-            //按照棋盘的布局，获取某个棋子的邻居
-            getNeighbors(pieceId) {
-                let neighbors = [];
-                for (let i = 0; i < this.rows.length; i++) {
-                    let row = this.rows[i];
-                    let index = row.indexOf(pieceId);
-                    if (index !== -1) {
-                        // 如果找到了包含这个棋子的行，那么获取这个棋子的邻居
-                        
-                    }
-                }
-                return neighbors;
             }
 
             //按照棋盘的布局，输出棋盘的状态
@@ -253,19 +224,96 @@
 
             // 翻转对方的棋子
             flipOpponentPieces(pieceId) {
-                // 这里的逻辑需要你自己实现，你需要找到所有需要翻转的对方的棋子，并调用它们的flip方法
+                let opponentColor = this.currentPlayer === "#000000" ? "#FFFFFF" : "#000000";
+                    let flipList = []; // 添加一个等待翻转的列表
+                // 遍历所有的行，查找包含这个棋子的行
+                for (let i = 0; i < this.board.rows.length; i++) {
+                    let row = this.board.rows[i];
+                    let index = row.indexOf(pieceId);
+                    if (index !== -1) {
+                        // 如果找到了包含这个棋子的行，那么判断这个棋子是否可以被放置
+                        // 检查这个棋子左边和右边是否有对方的棋子，如果有，那么这个棋子就可以被放置
+                        if (index > 0 && this.board.pieces[row[index - 1]].color === opponentColor) {
+                            // 检查对方的棋子的左边是否有自己的棋子
+                            for (let j = index - 2; j >= 0; j--) {
+                                if (this.board.pieces[row[j]].color === null || this.board.pieces[row[j]].color === "#4DC4FF") {
+                                    break;
+                                } else if (this.board.pieces[row[j]].color === this.currentPlayer) {
+                                    for (let k = j + 1; k < index; k++) {
+                                        if (!flipList.includes(row[k])) { // 检查棋子是否已经在列表中
+                                            flipList.push(row[k]); // 如果不在列表中，就添加到列表中
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (index < row.length - 1 && this.board.pieces[row[index + 1]].color === opponentColor) {
+                            // 检查对方的棋子的右边是否有自己的棋子
+                            for (let j = index + 2; j < row.length; j++) {
+                                if (this.board.pieces[row[j]].color === null || this.board.pieces[row[j]].color === "#4DC4FF") {
+                                    break;
+                                } else if (this.board.pieces[row[j]].color === this.currentPlayer) {
+                                    for (let k = index + 1; k < j; k++) {
+                                        if (!flipList.includes(row[k])) { // 检查棋子是否已经在列表中
+                                            flipList.push(row[k]); // 如果不在列表中，就添加到列表中
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }                   
+                }
+                // 在所有可能的行都判断完毕后进行翻转
+                for (let i = 0; i < flipList.length; i++) {
+                    this.board.pieces[flipList[i]].flip();
+                } 
             }
 
             // 切换当前玩家
-            switchPlayer() {
+            switchPlayer(attempts = 0) {
                 if (this.currentPlayer === "#000000") {
                     this.currentPlayer = "#FFFFFF";
                 } else {
                     this.currentPlayer = "#000000";
                 }
                 if (!this.hasLegalMove()) {
-                    this.switchPlayer();
+                    if (attempts < 1) {
+                        console.log("No legal move for " + this.currentPlayer + ", switch to the other player.");
+                        this.switchPlayer(attempts + 1);
+                    } else {
+                        console.log("No legal moves for both players. Game over.");
+                        // 这里可以添加游戏结束的代码
+                        let score = this.getScore();
+                        console.log("Final score: " + JSON.stringify(score));
+                        if (score.black > score.white) {
+                            console.log("Black wins!");
+                        } else if (score.black < score.white) {
+                            console.log("White wins!");
+                        } else {
+                            console.log("It's a tie!");
+                        }
+                        renderMap();
+                    }
                 }
+            }
+
+            getScore() {
+                let blackScore = 0;
+                let whiteScore = 0;
+                for (let i = 1; i <= 54; i++) {
+                    let piece = this.board.pieces[i];
+                    if (piece.color === "#000000") {
+                        blackScore++;
+                    } else if (piece.color === "#FFFFFF") {
+                        whiteScore++;
+                    }
+                }
+                return {
+                    black: blackScore,
+                    white: whiteScore
+                };
             }
         }
         
@@ -285,23 +333,29 @@
             for (let i = 2; i <= 28; i++) {
                 let elem = document.getElementById('two-' + i);
                 if (elem) {
+                    let id = idMapping[elem.id];
                     elem.addEventListener('click', function() {
-                        userInput = idMapping[elem.id];
-                        console.log(idMapping[elem.id]);
-                        // elem.setAttribute('fill', elem.getAttribute('fill') === colors.up ? '#000000' : colors.up);
+                        // console.log(id);
+                        if (userInputResolve) {
+                            userInputResolve(id);
+                            userInputResolve = null;
+                        }
                     });
-                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.up : game.board.pieces[idMapping[elem.id]].color);
+                    elem.setAttribute('fill', game.board.pieces[id].color === null ? colors.up : game.board.pieces[id].color);
                 }
             }
             for (let i = 30; i <= 56; i++) {
                 let elem = document.getElementById('two-' + i);
                 if (elem) {
+                    let id = idMapping[elem.id];
                     elem.addEventListener('click', function() {
-                        userInput = idMapping[elem.id];
-                        console.log(idMapping[elem.id]);
-                        // elem.setAttribute('fill', elem.getAttribute('fill') === colors.down ? '#FFFFFF' : colors.down);
+                        // console.log(id);
+                        if (userInputResolve) {
+                            userInputResolve(id);
+                            userInputResolve = null;
+                        }
                     });
-                    elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.down : game.board.pieces[idMapping[elem.id]].color);
+                    elem.setAttribute('fill', game.board.pieces[id].color === null ? colors.down : game.board.pieces[id].color);
                 }
             }
         }
@@ -319,7 +373,6 @@
                     elem.setAttribute('fill', game.board.pieces[idMapping[elem.id]].color === null ? colors.down : game.board.pieces[idMapping[elem.id]].color);
                 }
             }
-            console.log("\n");
             game.board.printBoard();
         }
 
@@ -329,8 +382,11 @@
 
         async function main() {
             while (game.hasLegalMove()) {
+                console.log("Current player: " + game.currentPlayer);
+                console.log("Score: " + JSON.stringify(game.getScore()));
                 renderMap();
                 let pieceId = await getUserInput();
+                // console.log(pieceId);
                 game.makeMove(pieceId);
             }
 
