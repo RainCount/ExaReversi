@@ -456,8 +456,8 @@ function initialize() {
     createSvgFilter('shadow1', '5', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0');
     createSvgFilter('shadow2', '4', '0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0');
 
-    let elem = document.getElementById('two-' + 0);
-    elem.setAttribute('transform', 'matrix(1, 0, 0, 1, 0, 70)');
+    // let elem = document.getElementById('two-' + 0);
+    // elem.setAttribute('transform', 'matrix(1, 0, 0, 1, 0, 70)');
     elem = document.getElementById('two-' + 1);
     elem.style.filter = 'url(#shadow2)';
 
