@@ -1,0 +1,8 @@
+html, body {
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #98FB98, #87CEFA);
+}
